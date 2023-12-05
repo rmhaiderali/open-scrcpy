@@ -9,8 +9,7 @@ import (
 	"github.com/net-byte/go-gateway"
 )
 
-func printMessageAndExit(msg string) {
-	fmt.Println(msg)
+func exit() {
 	fmt.Print("Press enter key to exit")
 	fmt.Scanln()
 	os.Exit(0)
@@ -19,10 +18,13 @@ func printMessageAndExit(msg string) {
 func main() {
 	gateway, err := gateway.DiscoverGatewayIPv4()
 	if err != nil {
-		printMessageAndExit("Unable to discover Gateway IP")
+		fmt.Println("Unable to discover Gateway IP")
+		fmt.Println()
+		exit()
 	}
 
 	fmt.Println("Gateway IP: ", gateway)
+	fmt.Println()
 
 	var port int
 
@@ -30,6 +32,7 @@ func main() {
 		fmt.Print("Enter port number between 0 to 65535: (5555) ")
 		var input string
 		fmt.Scanln(&input)
+		fmt.Println()
 		if input == "" {
 			port = 5555
 			break
@@ -40,23 +43,18 @@ func main() {
 		}
 	}
 
-	cmd := exec.Command("adb", "connect", fmt.Sprint(gateway, ":", port))
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		printMessageAndExit(fmt.Sprint(err))
-	}
+	// run following command to list all connected devices with their identifiers
+	// adb devices
 
-	fmt.Println()
+	cmd := exec.Command("adb", "-s", "<device_serial>", "tcpip", fmt.Sprint(port))
+	output, _ := cmd.CombinedOutput()
 	fmt.Print(string(output))
-
-	cmd = exec.Command("scrcpy")
-	output, err = cmd.CombinedOutput()
-	if err != nil {
-		printMessageAndExit(fmt.Sprint(err))
-	}
-
 	fmt.Println()
-	fmt.Print(string(output))
 
-	printMessageAndExit("")
+	cmd = exec.Command("scrcpy", fmt.Sprint("--tcpip=", gateway, ":", port))
+	output, _ = cmd.CombinedOutput()
+	fmt.Print(string(output))
+	fmt.Println()
+
+	exit()
 }

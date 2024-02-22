@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net"
 	"os"
 	"os/exec"
 	"strconv"
@@ -16,15 +17,26 @@ func exit() {
 }
 
 func main() {
-	gateway, err := gateway.DiscoverGatewayIPv4()
+	ip, err := gateway.DiscoverGatewayIPv4()
 	if err != nil {
 		fmt.Println("Unable to discover Gateway IP")
 		fmt.Println()
 		exit()
 	}
 
-	fmt.Println("Gateway IP: ", gateway)
-	fmt.Println()
+	for {
+		fmt.Print(fmt.Sprint("Device IP: (", ip, ") "))
+		var input string
+		fmt.Scanln(&input)
+		fmt.Println()
+		if input == "" {
+			break
+		}
+		ip = net.ParseIP(input)
+		if ip != nil {
+			break
+		}
+	}
 
 	var port int
 
@@ -51,7 +63,7 @@ func main() {
 	fmt.Print(string(output))
 	fmt.Println()
 
-	cmd = exec.Command("scrcpy", fmt.Sprint("--tcpip=", gateway, ":", port))
+	cmd = exec.Command("scrcpy", fmt.Sprint("--tcpip=", ip, ":", port))
 	output, _ = cmd.CombinedOutput()
 	fmt.Print(string(output))
 	fmt.Println()

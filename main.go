@@ -25,15 +25,16 @@ func main() {
 	}
 
 	for {
-		fmt.Print(fmt.Sprint("Device IP: (", ip, ") "))
+		fmt.Print(fmt.Sprint("Enter device IP: (", ip, ") "))
 		var input string
 		fmt.Scanln(&input)
 		fmt.Println()
 		if input == "" {
 			break
 		}
-		ip = net.ParseIP(input)
-		if ip != nil {
+		parsedIP := net.ParseIP(input)
+		if parsedIP != nil {
+			ip = parsedIP
 			break
 		}
 	}

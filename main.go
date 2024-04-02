@@ -42,7 +42,7 @@ func main() {
 	var port int
 
 	for {
-		fmt.Print("Enter port number between 0 to 65535: (5555) ")
+		fmt.Print("Enter port number between 0 to 65536: (5555) ")
 		var input string
 		fmt.Scanln(&input)
 		fmt.Println()
@@ -51,15 +51,16 @@ func main() {
 			break
 		}
 		port, err = strconv.Atoi(input)
-		if err == nil && port >= 0 && port <= 65535 {
+		if err == nil && port > 0 && port < 65536 {
 			break
 		}
 	}
 
-	// run following command to list all connected devices with their identifiers
-	// adb devices
+	// run "adb devices" command to list all
+	// connected devices with their identifiers and
+	// replace {device_serial} with your device identifier
 
-	cmd := exec.Command("adb", "-s", "<device_serial>", "tcpip", fmt.Sprint(port))
+	cmd := exec.Command("adb", "-s", "{device_serial}", "tcpip", fmt.Sprint(port))
 	output, _ := cmd.CombinedOutput()
 	fmt.Print(string(output))
 	fmt.Println()
